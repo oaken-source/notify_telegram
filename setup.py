@@ -23,7 +23,6 @@ setup(
 
     install_requires=[
         'configparser',
-        'dbus-python',
         'pygobject',
         'python-telegram-bot',
     ],

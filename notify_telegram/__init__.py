@@ -48,16 +48,18 @@ class NotificationFetcher(dbus.service.Object):
 
             text = icon + ("%s %s" % (summary, body)).strip()
 
+            recipient = int(hints['recipient']) if 'recipient' in hints else self._recipient
+
             if 'document' in hints:
                 print(self._bot.sendDocument(
-                    self._recipient,
+                    recipient,
                     open(hints['document'], 'rb'),
                     caption=text,
                     parse_mode=telegram.ParseMode.MARKDOWN,
                     disable_notification=(urgency == 0)))
             else:
                 print(self._bot.sendMessage(
-                    self._recipient,
+                    recipient,
                     text,
                     parse_mode=telegram.ParseMode.MARKDOWN,
                     disable_notification=(urgency == 0)))
