@@ -22,7 +22,6 @@ setup(
     },
 
     install_requires=[
-        'configparser',
         'pygobject',
         'python-telegram-bot',
     ],
