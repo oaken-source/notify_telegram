@@ -5,7 +5,7 @@ from setuptools import setup
 
 setup(
     name='notify_telegram',
-    version='0.1',
+    version='0.2',
     maintainer='Andreas Grapentin',
     maintainer_email='andreas@grapentin.org',
     url='https://github.com/oaken-source/notify_telegram',
@@ -23,7 +23,7 @@ setup(
 
     install_requires=[
         'pygobject',
-        'python-telegram-bot',
+        'pytelegrambotapi',
     ],
 
     license='GPLv3',

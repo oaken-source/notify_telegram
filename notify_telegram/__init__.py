@@ -7,7 +7,7 @@ import dbus
 import dbus.service
 import dbus.mainloop.glib
 from gi.repository import GLib
-import telegram
+import telebot
 
 
 def read_config(path):
@@ -24,7 +24,7 @@ class NotificationFetcher(dbus.service.Object):
         ''' constructor '''
         self._id = 0
         self._recipient, self._token = read_config('/etc/notify_telegram.conf')
-        self._bot = telegram.Bot(token=self._token)
+        self._bot = telebot.TeleBot(self._token)
         super(NotificationFetcher, self).__init__(*args, **kwargs)
 
     _method = "org.freedesktop.Notifications"
@@ -34,39 +34,36 @@ class NotificationFetcher(dbus.service.Object):
         # pylint: disable=invalid-name,too-many-arguments
         ''' this is called when we get a new notification '''
 
-        try:
-            self._id += 1
-            notification_id = self._id
+        self._id += 1
+        notification_id = self._id
 
-            urgency = int(hints['urgency']) if 'urgency' in hints else 1
+        urgency = int(hints['urgency']) if 'urgency' in hints else 1
 
-            icon = ""
-            if hints.get('category', None) == 'error':
-                icon = "\U0001F6A8 "
-            if hints.get('category', None) == 'success':
-                icon = "\U00002705 "
+        icon = ""
+        if hints.get('category', None) == 'error':
+            icon = "\U0001F6A8 "
+        if hints.get('category', None) == 'success':
+            icon = "\U00002705 "
 
-            text = icon + ("%s %s" % (summary, body)).strip()
+        text = icon + ("%s %s" % (summary, body)).strip()
 
-            recipient = int(hints['recipient']) if 'recipient' in hints else self._recipient
+        recipient = int(hints['recipient']) if 'recipient' in hints else self._recipient
 
-            if 'document' in hints:
-                print(self._bot.sendDocument(
-                    recipient,
-                    open(hints['document'], 'rb'),
-                    caption=text,
-                    parse_mode=telegram.ParseMode.MARKDOWN,
-                    disable_notification=(urgency == 0)))
-            else:
-                print(self._bot.sendMessage(
-                    recipient,
-                    text,
-                    parse_mode=telegram.ParseMode.MARKDOWN,
-                    disable_notification=(urgency == 0)))
+        if 'document' in hints:
+            print(self._bot.send_document(
+                recipient,
+                open(hints['document'], 'rb'),
+                caption=text,
+                parse_mode="MARKDOWN",
+                disable_notification=(urgency == 0)))
+        else:
+            print(self._bot.send_message(
+                recipient,
+                text,
+                parse_mode="MARKDOWN",
+                disable_notification=(urgency == 0)))
 
-            return notification_id
-        except Exception as e:
-            print(e)
+        return notification_id
 
     @dbus.service.method(_method, in_signature='', out_signature='ssss')
     def GetServerInformation(self):
